@@ -1,0 +1,20 @@
+{
+	"Type": "Live2D Expression",
+	"Parameters": [
+		{
+			"Id": "ParamBrowLY",
+			"Value": -1,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamBrowRY",
+			"Value": -1,
+			"Blend": "Override"
+		},
+        {
+			"Id": "Key3",
+			"Value": 1,
+			"Blend": "Override"
+		}
+	]
+}

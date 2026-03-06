@@ -1,0 +1,46 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "Lavender.moc3",
+		"Textures": [
+			"textures/texture_00.png",
+			"textures/texture_01.png"
+		],
+		"Physics": "Lavender.physics3.json",
+		"DisplayInfo": "Lavender.cdi3.json",
+
+		"Motions": { 
+			"Idle1": [
+				{ "File": "motions/idle.motion3.json" }
+			],
+			"Idle3": [
+				{ "File": "motions/taishou.motion3.json" }
+			],
+			"Idle2": [
+				{ "File": "motions/shoushu.motion3.json" }
+			]
+		},
+
+		"Expressions": [ 
+			{ "Name": "smile", "File": "expressions/smile.exp3.json" },
+			{ "Name": "sad", "File": "expressions/sad.exp3.json" },
+			{ "Name": "angry", "File": "expressions/angry.exp3.json" },
+			{ "Name": "blush", "File": "expressions/blush.exp3.json" },
+			{ "Name": "confused", "File": "expressions/confused.exp3.json" },
+			{ "Name": "surprise", "File": "expressions/surprise.exp3.json" },
+			{ "Name": "reset", "File": "expressions/reset.exp3.json" }
+		]
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": ["ParamEyeLOpen", "ParamEyeROpen"]
+		},
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": ["ParamMouthOpenY"]
+		}
+	]
+}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rin AI Companion</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Tải các file JS xử lý logic ở đây -->
+    <script src="./apiService.js" type="module"></script>
+    <script src="./auth.js" type="module"></script>
+    <!-- ui.js đã được gộp vào ui_controls.js -->
+</head>
+<body>
+    <canvas id="live2d-canvas"></canvas>
+
+
+
+    <!-- MODAL ĐĂNG NHẬP/ĐĂNG KÝ -->
+    <div id="auth-modal" class="modal-container hidden">
+        <div id="auth-section" class="modal-content">
+            <!-- Form Đăng nhập -->
+            <div id="login-form">
+                <h2>Đăng nhập</h2>
+                <div class="form-group">
+                    <input type="email" id="login-email" placeholder="Email">
+                    <input type="password" id="login-password" placeholder="Mật khẩu">
+                </div>
+                <button id="login-btn" class="form-btn">Đăng nhập</button>
+                <p class="form-switch">Chưa có tài khoản? <a href="#" id="show-register">Đăng ký</a></p>
+            </div>
+            <!-- Form Đăng ký -->
+            <div id="register-form" style="display: none;">
+                <h2>Đăng ký</h2>
+                <div class="form-group">
+                    <input type="text" id="register-username" placeholder="Tên đăng nhập">
+                    <input type="email" id="register-email" placeholder="Email">
+                    <input type="password" id="register-password" placeholder="Mật khẩu">
+                </div>
+                <button id="register-btn" class="form-btn">Đăng ký</button>
+                <p class="form-switch">Đã có tài khoản? <a href="#" id="show-login">Đăng nhập</a></p>
+            </div>
+            <p id="auth-message" class="auth-message-style"></p>
+        </div>
+    </div>
+
+    <!-- PANEL TƯƠNG TÁC VỚI CÁC TAB -->
+    <div id="interaction-panel" class="side-panel">
+        <!-- Khu vực hiển thị thông tin người dùng -->
+        <div id="user-info-panel" class="panel-section" style="display: none;">
+             <h3 id="welcome-message"></h3>
+    <!-- === THÊM MỚI BẮT ĐẦU TỪ ĐÂY ===
+            <div class="user-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">❤️</span>
+                    <span id="affection-points-display" class="stat-value">...</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">💎</span>
+                    <span id="currency-display" class="stat-value">...</span>
+                </div>
+            </div> -->
+    <!-- === KẾT THÚC THÊM MỚI === -->
+             <button id="logout-btn">Đăng xuất</button>
+        </div>
+        <!-- Thanh Tab -->
+        <nav class="panel-tabs">
+            <button class="tab-link active" data-tab="tab-expressions">Biểu cảm</button>
+            <button class="tab-link" data-tab="tab-motions">Tương tác</button>
+            <button class="tab-link" data-tab="tab-appearance">Cài đặt</button>
+        </nav>
+        <!-- Nội dung các Tab -->
+        <div id="tab-expressions" class="tab-content active">
+            <div class="icon-grid">
+                 <button id="btn-expr-smile">😊</button>
+                 <button id="btn-expr-sad">😢</button>
+                 <button id="btn-expr-angry">😡</button>
+                 <button id="btn-expr-blush">😳</button>
+                 <button id="btn-expr-surprised">😮</button>
+                 <button id="btn-expr-confused">😵‍💫</button>
+                 <button id="btn-expr-reset">🔄</button>
+            </div>
+        </div>
+        <div id="tab-motions" class="tab-content">
+            <div class="button-group">
+                <button id="btn-motion-idle1">Không làm gì</button>
+                <button id="btn-motion-idle2">Cầm sách 1</button>
+                <button id="btn-motion-idle3">Cầm sách 2</button>
+            </div>
+        </div>
+        <div id="tab-appearance" class="tab-content">
+             <div class="button-group">
+                <button id="btn-change-bg">Đổi Background</button>
+                <button class="personality-btn active" data-type="genki">Đổi tính cách Genki</button>
+                <button class="personality-btn" data-type="tsundere">Đổi tính cách Tsundere</button>
+            </div>
+        </div>
+    </div>
+    <input type="file" id="bg-input" accept="image/*" style="display: none;">
+
+    <!-- THANH CÔNG CỤ CHÍNH -->
+    <div id="main-toolbar">
+        <button id="user-btn" title="Tài khoản">🔑</button>
+        <button id="interaction-panel-btn" title="Tương tác">✨</button>
+    </div>
+
+    <button id="conversations-panel-btn" title="Danh sách hội thoại">💬</button>
+    <!-- Chat UI -->
+
+        <!-- === THÊM MỚI: Chọn ngôn ngữ giọng nói (Tách biệt khỏi chat-ui) === -->
+    <div id="lang-selector-wrapper">
+        <select id="s2t-lang-select" title="Chọn ngôn ngữ nói">
+            <option value="vi" selected>🇻🇳 VI</option>
+            <option value="en">🇺🇸 EN</option>
+            <option value="zh">🇨🇳 ZH</option>
+            <option value="jp">🇯🇵 JP</option>
+            <option value="kr">🇰🇷 KR</option>
+        </select>
+    </div>
+    <!-- ================================================================ -->
+
+    <div id="chat-ui">
+        <button id="mic-btn">🎤</button>
+        <input type="text" id="chat-input" placeholder="Trò chuyện với Rin...">
+        <button id="send-btn">▶</button>
+    </div>
+    <div id="response-text"></div>
+
+
+
+    <!-- === THÊM MỚI: PANEL LỊCH SỬ TIN NHẮN === -->
+    <div id="message-history-panel" class="history-panel hidden">
+        <button id="close-history-btn" title="Đóng khung chat">×</button>
+        <div id="message-list">
+            <!-- Tin nhắn sẽ được JS chèn vào đây -->
+        </div>
+    </div>
+
+
+        <!-- === KIỂM TRA LẠI ID Ở ĐÂY === -->
+    <div id="conversations-panel" class="side-panel left"> <!-- CẦN ID NÀY -->
+        <div class="panel-header">
+            <button id="new-chat-btn">Hội thoại mới</button> <!-- CẦN ID NÀY -->
+        </div>
+        <div id="conversations-list" class="panel-body"> <!-- CẦN ID NÀY -->
+            <!-- Danh sách các cuộc hội thoại sẽ được JS chèn vào đây -->
+        </div>
+    </div>
+
+
+    <!-- Tải thư viện -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.5.2/browser/pixi.min.js"></script>
+    <script src="./lib/live2dcubismcore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism4.min.js"></script>
+    <script src="./main.js" type="module"></script>
+</body>
+</html>

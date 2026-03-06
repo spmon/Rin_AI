@@ -1,0 +1,32 @@
+{
+	"Type": "Live2D Expression",
+	"FadeInTime": 0.3,
+	"FadeOutTime": 0.6,
+	"Parameters": [
+		{
+			"Id": "Key2",
+			"Value": 1,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamAngleZ",
+			"Value": -12,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamMouthOpenY",
+			"Value": 0.3,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamBrowLY",
+			"Value": -0.5,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamBrowRY",
+			"Value": -0.5,
+			"Blend": "Override"
+		}
+	]
+}

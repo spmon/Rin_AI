@@ -1,0 +1,42 @@
+{
+	"Type": "Live2D Expression",
+	"FadeInTime": 0.5,
+	"FadeOutTime": 0.5,
+	"Parameters": [
+		{
+			"Id": "Key5",
+			"Value": 1,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamAngleY",
+			"Value": -20,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamBrowLY",
+			"Value": 0.4,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamBrowRY",
+			"Value": 0.4,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamBrowLAngle",
+			"Value": 0.5,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamBrowRAngle",
+			"Value": -0.5,
+			"Blend": "Override"
+		},
+		{
+			"Id": "ParamMouthForm",
+			"Value": 1,
+			"Blend": "Override"
+		}
+	]
+}
