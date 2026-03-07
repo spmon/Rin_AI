@@ -20,7 +20,7 @@ export async function initVision(wsUrl) {
         ws.onopen = () => {
             console.log("✅ Vision Socket Connected");
             // Gửi luồng cam liên tục (Fast path)
-            setInterval(sendStreamFrame, 200); 
+            setInterval(sendStreamFrame, 100); 
         };
 
         ws.onmessage = (event) => {

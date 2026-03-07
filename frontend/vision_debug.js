@@ -26,6 +26,7 @@ export function initVisionDebug() {
             <video id="debug-video" autoplay playsinline muted></video>
             <div id="debug-overlay">
                 <div id="debug-action">Action: Idle</div>
+                <div id="debug-emotion" style="display:none">Emotion: ---</div>
                 <div id="debug-objects" style="display:none">Objects: ---</div>
             </div>
         </div>
@@ -126,6 +127,11 @@ export function initVisionDebug() {
             padding: 3px 8px; border-radius: 4px; 
             font-size: 11px; font-weight: bold; width: fit-content; 
         }
+        #debug-emotion { 
+            background: rgba(155, 89, 182, 0.9); color: #fff;
+            padding: 3px 8px; border-radius: 4px; 
+            font-size: 11px; font-weight: bold; width: fit-content; 
+        }
         #debug-objects { 
             background: rgba(230, 126, 34, 0.9); color: #fff;
             padding: 3px 8px; border-radius: 4px; 
@@ -217,6 +223,7 @@ export function initVisionDebug() {
     const video = document.getElementById('debug-video');
     const actionEl = document.getElementById('debug-action');
     const objectsEl = document.getElementById('debug-objects');
+    const emotionEl = document.getElementById('debug-emotion');
 
     navigator.mediaDevices.getUserMedia({ video: { width: 320, height: 240 } })
         .then(stream => {
@@ -239,6 +246,13 @@ export function initVisionDebug() {
                 actionEl.style.background = 'rgba(46, 204, 113, 0.9)';
             } else {
                 actionEl.style.background = 'rgba(149, 165, 166, 0.9)';
+            }
+
+            if (data.emotion && data.emotion !== "Error" && data.emotion !== "No Face") {
+                emotionEl.innerText = `Emotion: ${data.emotion}`;
+                emotionEl.style.display = 'block'; 
+            } else {
+                emotionEl.style.display = 'none'; 
             }
 
             if (data.objects && data.objects.length > 0) {

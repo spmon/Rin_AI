@@ -291,5 +291,48 @@ export function setupInteractions(app, model, speakFunction) {
         updateHitAreas(model);
     });
 
+const emotionMap = {
+        'Happy': 'smile',
+        'Sad': 'sad',
+        'Angry': 'angry',
+        'Surprise': 'surprise',
+        'Neutral': 'reset',
+        'Fear': 'sad',     
+        'Disgust': 'angry' 
+    };
+
+    // Biến cản spam để nhớ biểu cảm hiện tại
+    let currentVisionExpression = 'reset'; 
+
+    // Lắng nghe sự kiện từ Vision
+    window.addEventListener('vision-data', (e) => {
+        const data = e.detail;
+
+        if (data.type === "action_result" && data.emotion) {
+            const backendEmotion = data.emotion;
+
+            // 1. Nếu Backend báo lỗi model, kệ nó, bỏ qua không làm gì hết
+            if (backendEmotion === "Error") return;
+
+            let expressionName = null;
+
+            // 2. Nếu Backend báo không thấy mặt ai, tự động trả Rin về mặt bình thường
+            if (backendEmotion === "No Face") {
+                expressionName = 'reset';
+            } else {
+                // 3. Nếu có mặt, dịch từ Cảm xúc Backend -> Tên file của Rin
+                expressionName = emotionMap[backendEmotion];
+            }
+
+            // 4. Nếu model đang rảnh rỗi và có lệnh đổi mặt mới
+            if (!isActionActive && model && expressionName && expressionName !== currentVisionExpression) {
+                model.expression(expressionName);
+                currentVisionExpression = expressionName; // Lưu lại để chống spam
+                console.log(`[Vision Emotion] Rin đổi mặt thành: ${expressionName} (Nhận diện: ${backendEmotion})`);
+            }
+        }
+    });
+
+    // Dòng log này để check xem file load thành công chưa
     console.log("Interaction Manager initialized.");
 }

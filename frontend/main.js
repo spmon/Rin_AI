@@ -14,7 +14,7 @@ import { setupConversationControls } from './chatManager.js';
 import { initVision } from './vision_manager.js';
 import { initVisionDebug } from './vision_debug.js';
 // Thay link ngrok vision của bạn
-initVision("wss://sherise-pregame-joslyn.ngrok-free.dev");
+initVision("ws://localhost:8080");
 
 // import { initializeChatSystem } from './chatsystem.js';
 

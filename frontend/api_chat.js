@@ -11,7 +11,17 @@ const TRIGGER_THRESHOLD = 2000;
 const ACTION_COOLDOWN = 30000; 
 let lastTriggeredActionTime = {};
 let pendingUserQuestion = ""; // Lưu câu hỏi chờ bối cảnh từ Vision
-
+let latestEmotion = "Neutral"; 
+const EMOTION_VI = {
+    'Happy': 'đang cười rất vui vẻ',
+    'Sad': 'trông có vẻ buồn bã',
+    'Angry': 'đang cau mày tức giận',
+    'Surprise': 'đang rất ngạc nhiên',
+    'Fear': 'trông có vẻ sợ hãi',
+    'Disgust': 'đang nhăn mặt khó chịu',
+    'Neutral': 'có nét mặt bình thường',
+    'No Face': 'đã rời đi, không có mặt trước màn hình'
+};
 const VISION_KEYWORDS = ["là gì", "cái này", "đây là", "nhìn", "thấy không", "màu gì", "what is this", "look", "thấy", "trông", "đẹp không","xấu không", "cầm gì"];
 
 function showResponse(text) {
@@ -72,6 +82,11 @@ export async function sendMessage(model, customText = null, visionDescription = 
 
     // 4. CHUẨN BỊ NỘI DUNG GỬI AI (Xử lý ngầm)
     let messageToSendToAPI = userInput;
+    let emotionText = EMOTION_VI[latestEmotion] || latestEmotion;
+    let contextPrompt = `[Bối cảnh ngầm từ Camera: Người dùng ${emotionText}] `;
+    
+    // Ghép bối cảnh ngầm vào câu nói của người dùng
+    messageToSendToAPI = contextPrompt + userInput;
     if (visionDescription) {
         // Chỉ ghép bối cảnh vào biến gửi đi, KHÔNG động vào biến userInput
         messageToSendToAPI = `${userInput}`;
@@ -132,7 +147,9 @@ export function setupVisionListener(model) {
         if (data.type === "action_result") {
             const currentAction = data.action;
             const confidence = data.action_confidence;
-
+            if (data.emotion && data.emotion !== "Error") {
+                latestEmotion = data.emotion;
+            }
             if (confidence > 0.8) {
                 const now = Date.now();
                 if (!actionTimers[currentAction]) actionTimers[currentAction] = now;
