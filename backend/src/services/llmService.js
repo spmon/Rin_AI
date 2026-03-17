@@ -116,6 +116,17 @@ const llmService = {
             console.error("!!! LỖI TẠI LLM SERVICE:", error.message);
             return { response: "Máy móc của Rin bị hỏng rồi, tại bạn đấy!", expression: "angry", extract_memories: [] };
         }
+    },
+    async getEmbedding(text) {
+        try {
+            // Dùng model embedding xịn nhất của Google hiện tại
+            const embedModel = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
+            const result = await embedModel.embedContent(text);
+            return result.embedding.values;
+        } catch (error) {
+            console.error("!!! LỖI TẠI GET EMBEDDING:", error.message);
+            return null; // Trả về null nếu lỗi để hệ thống không bị crash
+        }
     }
 };
 

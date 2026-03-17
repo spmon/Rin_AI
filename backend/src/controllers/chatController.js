@@ -1,6 +1,6 @@
 const llmService = require('../services/llmService');
 const db = require('../config/db');
-
+const vectorService = require('../services/vectorService');
 /**
  * Xử lý gửi tin nhắn chat
  */
@@ -46,10 +46,24 @@ exports.handleChatMessage = async (req, res) => {
             [conversationId]
         );
         const history = historyRows.reverse();
+        const queryVector = await llmService.getEmbedding(promptForAI);
+        let relatedContext = [];
+        
+        if (queryVector) {
+            // Tìm 5 câu liên quan nhất trong toàn bộ quá khứ (Trí nhớ dài hạn)
+            relatedContext = await vectorService.searchRelatedMessages(userId, queryVector, 5);
+        }
 
-        // 5. GỌI AI (SỬA Ở ĐÂY: Truyền promptForAI thay vì message)
-        const rinData = await llmService.askGemini(promptForAI, history, memories, personality);
+        // Nhúng ký ức dài hạn vào prompt cho AI
+        let finalPrompt = promptForAI;
+        if (relatedContext.length > 0) {
+            console.log("🧠 [RAG] Đã tìm thấy ký ức liên quan:", relatedContext);
+            finalPrompt = `[KÝ ỨC CŨ LIÊN QUAN ĐỂ THAM KHẢO]:\n${relatedContext.join('\n')}\n\n[TIN NHẮN HIỆN TẠI CỦA USER]: ${promptForAI}`;
+        }
+        // ---------------------------------------------------
 
+        // 5. GỌI AI (Truyền finalPrompt thay vì promptForAI)
+        const rinData = await llmService.askGemini(finalPrompt, history, memories, personality);
         // 6. Quản lý ký ức mới
         if (rinData.extract_memories && Array.isArray(rinData.extract_memories)) {
             for (let m of rinData.extract_memories) {
@@ -82,14 +96,21 @@ exports.handleChatMessage = async (req, res) => {
         // 8. LƯU TIN NHẮN VÀO DB (SỬA Ở ĐÂY: Lưu message gốc để UI sạch sẽ)
         const saveSql = `
             INSERT INTO chat_messages (user_id, conversation_id, role, content) 
-            VALUES (?, ?, ?, ?), (?, ?, ?, ?)
+            VALUES (?, ?, ?, ?)
         `;
-        const values = [
-            userId, conversationId, 'user', message, // <--- Chỉ lưu "cái này là gì"
-            userId, conversationId, 'assistant', rinData.response
-        ];
-        await db.query(saveSql, values);
+        // Lưu câu hỏi của User
+        const [userMsgResult] = await db.query(saveSql, [userId, conversationId, 'user', message]);
+        const userMsgId = userMsgResult.insertId;
 
+        // Lưu câu trả lời của AI
+        await db.query(saveSql, [userId, conversationId, 'assistant', rinData.response]);
+
+        // Đẩy câu hỏi vào Vector DB để làm "ký ức" cho lần sau
+        if (queryVector) {
+            await vectorService.addMessageToVector(userId, userMsgId, message, queryVector);
+            // Đánh dấu là đã index
+            await db.query('UPDATE chat_messages SET is_indexed = 1 WHERE id = ?', [userMsgId]);
+        }
         // 9. Trả về cho Frontend
         res.status(200).json({ 
             response: rinData.response,
