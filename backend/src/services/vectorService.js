@@ -1,13 +1,21 @@
 const { ChromaClient } = require('chromadb');
 
-// Đã sửa lại cách cấu hình kết nối để hết cảnh báo "path is deprecated"
-const client = new ChromaClient({ host: "localhost", port: 8000 }); 
+const chromaUrl = process.env.CHROMA_URL || "http://localhost:8000";
+const parsedUrl = new URL(chromaUrl);
+
+// 2. Tách URL ra để chiều lòng phiên bản mới của ChromaDB
+const client = new ChromaClient({
+    host: parsedUrl.hostname,
+    port: parsedUrl.port || (parsedUrl.protocol === 'https:' ? 443 : 8000),
+    ssl: parsedUrl.protocol === 'https:'
+});
 
 // Tạo một hàm nhúng "giả" để đánh lừa ChromaDB. 
 // Việc này nói với Chroma rằng: "Đừng dùng model mặc định nữa, tao đã có Gemini lo phần Vector rồi!"
 const dummyEmbeddingFunction = {
     generate: (texts) => { return texts.map(() => []) }
 };
+
 
 const vectorService = {
     async addMessageToVector(userId, messageId, content, embedding) {

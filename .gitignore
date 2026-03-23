@@ -1,8 +1,17 @@
-# env
-.env
+# Bỏ qua Ngrok
+ngrok.exe
+ngrok.yml
 
-# dependencies
+# Bỏ qua biến môi trường bảo mật
+backend/.env
+frontend/.env
+Rin_vision/.env
+
+# Bỏ qua thư viện nặng
 node_modules/
+__pycache__/
+*.pyc
 
-# misc
-.DS_Store
+# Bỏ qua thư mục ảo của Python (nếu có)
+venv/
+env/
