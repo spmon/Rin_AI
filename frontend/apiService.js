@@ -1,6 +1,6 @@
 // frontend/apiService.js
 
-const API_BASE_URL = 'http://localhost:4000/api';
+const API_BASE_URL = 'https://rin-ai.onrender.com/api';
 /**
  * Gửi yêu cầu đăng ký tới backend.
  */
